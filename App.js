@@ -1,107 +1,75 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  SafeAreaView,
-  TouchableOpacity,
-  RefreshControl,
-} from 'react-native';
-
-const DATA = [
-  { id: '1', title: 'Afghanistan' },
-  { id: '2', title: 'Bahamas' },
-  { id: '3', title: 'Cabo Verde	' },
-  { id: '4', title: 'Denmark' },
-  { id: '5', title: 'Egypt' },
-  { id: '6', title: 'Fiji' },
-  { id: '7', title: 'Georgia' },
-  { id: '8', title: 'Haiti' },
-  { id: '9', title: 'India' },
-  { id: '10', title: 'Jordan' },
-];
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Importing FontAwesome for the Love icon
 
 const App = () => {
-  const [refreshing, setRefreshing] = useState(false);
+  const [number, setNumber] = useState(Math.floor(Math.random() * 100) + 1);
+  const [guess, setGuess] = useState('');
+  const [message, setMessage] = useState('');
+  const [showLove, setShowLove] = useState(false);
+  const [tries, setTries] = useState(0);
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => alert('Country you clicked ' + item.title)}>
-      <View style={styles.item}>
-        <Text style={styles.title}>{item.title}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const handleGuess = () => {
+    const numericGuess = parseInt(guess);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    // Simulate a network request
-    setTimeout(() => {
-      setRefreshing(false);
-      alert('List refreshed!');
-    }, 2000);
+    setTries(tries + 1); // Increment the number of tries on each guess
+
+    if (numericGuess === number) {
+      setMessage(`You guessed it right in ${tries + 1} tries!`);
+      setShowLove(true);
+    } else if (numericGuess < number) {
+      setMessage('Too low! Try again.');
+      setShowLove(false);
+    } else {
+      setMessage('Too high! Try again.');
+      setShowLove(false);
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={DATA}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={<Text style={styles.header}>Country List</Text>}
-        ListFooterComponent={<Text style={styles.footer}>End of List</Text>}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        /*refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }*/
-        horizontal={false}
+    <View style={styles.container}>
+      <Text style={styles.title}>Guess the Number (1-100)</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={guess}
+        onChangeText={setGuess}
+        placeholder="Enter your guess"
       />
-    </SafeAreaView>
+      <Button title="Guess" onPress={handleGuess} />
+      <Text style={styles.message}>{message}</Text>
+      <Text style={styles.tries}>Number of Tries: {tries}</Text>
+      {showLove && <Icon name="heart" size={50} color="red" />}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 30,
-    backgroundColor: '#f5f5f5',
-  },
-  item: {
-    backgroundColor: '#e1b8b8',
-    padding: 24,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5fcff',
   },
   title: {
-    fontSize: 18,
-    color: '#333333',
-  },
-  header: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 10,
-    color: '#333',
+    marginBottom: 20,
   },
-  footer: {
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    width: '80%',
+  },
+  message: {
+    fontSize: 18,
+    marginVertical: 10,
+  },
+  tries: {
     fontSize: 16,
-    textAlign: 'center',
     marginVertical: 10,
-    color: '#777',
-  },
-  separator: {
-    height: 1,
-    width: '100%',
-    backgroundColor: '#ccc',
   },
 });
 
